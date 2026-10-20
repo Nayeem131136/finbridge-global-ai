@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FinBridge Global AI — study-abroad funding &amp; cross-border payment assistant</title>
+<meta name="description" content="AI assistant that helps international students move money across borders safely. Sandbox demo.">
+<meta name="theme-color" content="#050914">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23050914'/%3E%3Cpath d='M6 21 Q16 3 26 21' fill='none' stroke='%232de2c5' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<a class="skip" href="#chatpanel" data-i18n="skip">Skip to content</a>
+<canvas id="globe" aria-hidden="true"></canvas>
+<div id="labels" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="brand"><svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><defs><linearGradient id="bg" x1="0" x2="1"><stop offset="0" stop-color="#2de2c5"/><stop offset="1" stop-color="#6aa8ff"/></linearGradient></defs><path d="M4 22 Q16 2 28 22" fill="none" stroke="url(#bg)" stroke-width="3.2" stroke-linecap="round"/><circle cx="4" cy="22" r="2.6" fill="#2de2c5"/><circle cx="28" cy="22" r="2.6" fill="#6aa8ff"/></svg>
+    <span>FinBridge<small>Global AI</small></span></div>
+  <div class="pills">
+    <button class="pill btn on" id="modePill" type="button" aria-haspopup="true">connecting…</button>
+    <span class="pill sand"><i></i><span data-i18n="sandbox">Sandbox · no real money</span></span>
+    <button class="pill btn on" id="langBtn" type="button" aria-label="Language / ভাষা"><b>EN</b> / বাংলা</button>
+    <span id="acct" class="acct"></span>
+    <button class="pill btn" id="hudToggle" type="button" aria-expanded="false" data-i18n="panel">Security panel</button>
+  </div>
+</header>
+
+<section class="hero" id="hero">
+  <h1><span data-i18n="h1a">Move money across borders</span> <em data-i18n="h1b">without the guesswork.</em></h1>
+  <p class="lede"><span data-i18n="lede_a">Compare routes, plan tuition, catch invoice fraud. Every transfer needs</span> <b data-i18n="lede_b">your own PIN or password</b><span data-i18n="lede_c"> — the AI can never send money alone.</span></p>
+  <button class="demo" id="demoBtn" type="button"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg><span data-i18n="demo">Run 60-second demo</span></button>
+</section>
+
+<main class="chatpanel glass" id="chatpanel">
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tabHome" aria-selected="false" aria-controls="paneHome" hidden>Home</button>
+    <button role="tab" id="tabStudy" aria-selected="false" aria-controls="paneStudy" hidden>Study plan</button>
+    <button role="tab" id="tabPlans" aria-selected="false" aria-controls="panePlans" hidden>My plans</button>
+    <button role="tab" id="tabChat" aria-selected="true" aria-controls="paneChat" data-i18n="tab_chat">Assistant</button>
+    <button role="tab" id="tabExplore" aria-selected="false" aria-controls="paneExplore" data-i18n="tab_explore">Cost Explorer</button>
+  </div>
+  <p id="guestNote" class="guestnote" hidden></p>
+  <section id="paneHome" class="pane scrolly" role="tabpanel" aria-labelledby="tabHome" hidden></section>
+  <section id="paneStudy" class="pane scrolly" role="tabpanel" aria-labelledby="tabStudy" hidden></section>
+  <section id="panePlans" class="pane scrolly" role="tabpanel" aria-labelledby="tabPlans" hidden></section>
+  <section id="paneChat" class="pane" role="tabpanel" aria-labelledby="tabChat">
+    <div class="log" id="log" aria-live="polite"></div>
+    <div class="chips" id="chips"></div>
+    <form id="form" class="composer" autocomplete="off">
+      <textarea id="input" rows="1" placeholder="Ask e.g. “Pay 1500 GBP tuition”" data-i18n-ph="ph" aria-label="Message"></textarea>
+      <button id="mic" type="button" hidden aria-label="Voice input"><svg viewBox="0 0 24 24" width="20" height="20"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0014 0M12 18v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <button id="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 12l16-8-6 16-3-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+    </form>
+  </section>
+  <section id="paneExplore" class="pane" role="tabpanel" aria-labelledby="tabExplore" hidden>
+    <div class="explore">
+      <p class="sub" data-i18n="ex_intro">Drag the slider: costs update live from the exchange rate and the globe redraws the routes. No AI needed.</p>
+      <div class="exrow">
+        <label><span data-i18n="ex_from">You pay in</span><select id="exFrom"></select></label>
+        <label><span data-i18n="ex_to">Recipient gets</span><select id="exTo"></select></label>
+      </div>
+      <label class="amt"><span data-i18n="ex_amount">Amount the recipient receives</span>
+        <div class="amtrow"><input id="exAmount" type="number" min="1" step="any" value="1500" inputmode="decimal"><b id="exTo2">GBP</b></div>
+        <input id="exSlider" type="range" min="100" max="20000" step="100" value="1500" aria-label="Amount">
+      </label>
+      <label><span data-i18n="ex_purpose">Purpose</span>
+        <select id="exPurpose"><option value="tuition">tuition</option><option value="living">living costs</option><option value="rent">rent</option><option value="books">books</option><option value="insurance">insurance</option><option value="family_support">family support</option></select>
+      </label>
+      <div id="exResult" class="exresult" aria-live="polite"></div>
+      <button class="ghost wide" id="exSave" type="button" data-i18n="save_cmp">Save this comparison</button>
+      <button class="go wide" id="exUse" type="button" data-i18n="ex_use">Ask the assistant to prepare this transfer</button>
+    </div>
+  </section>
+</main>
+
+<aside class="hud" id="hud" aria-label="Security and account panel">
+  <div class="glass card-h" id="statusCard">
+    <h2 data-i18n="status">System status</h2>
+    <ul class="status" id="status"></ul>
+  </div>
+  <div class="glass card-h">
+    <h2 data-i18n="wallet">Sandbox wallet</h2>
+    <div id="balances" class="bals"></div>
+  </div>
+  <div class="glass card-h">
+    <h2><span data-i18n="tier">Permission tier</span> <span class="hint" data-i18n="tier_hint">what the AI just touched</span></h2>
+    <div class="tiers" id="tiers">
+      <div class="tier" data-t="READ"><b>READ</b><span data-i18n="t_read">look up rates, balances</span></div>
+      <div class="tier" data-t="SUGGEST"><b>SUGGEST</b><span data-i18n="t_suggest">plans &amp; comparisons</span></div>
+      <div class="tier" data-t="EXECUTE"><b>EXECUTE</b><span data-i18n="t_exec">needs your confirmation</span></div>
+    </div>
+    <ol class="trace" id="trace"></ol>
+  </div>
+  <div class="glass card-h">
+    <h2><span data-i18n="audit">Tamper-proof audit log</span> <button id="refreshAudit" class="mini" type="button" data-i18n="refresh">refresh</button></h2>
+    <div id="chain" class="chainbadge">no actions yet</div>
+    <ol id="audit" class="audit"></ol>
+    <button class="tamper" id="tamperBtn" type="button" data-i18n="tamper">Try to tamper with the log</button>
+    <div id="tamperOut" class="tamperout" aria-live="polite"></div>
+  </div>
+  <div class="foot">Fictional providers · illustrative rates · Globe: Natural Earth · three.js</div>
+</aside>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="sheet glass">
+    <div class="lock" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><rect x="5" y="10" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 018 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+    <h2 id="mTitle" data-i18n="m_title">Confirm your transfer</h2>
+    <dl id="mBody" class="kv"></dl>
+    <div id="mWarn"></div>
+    <div id="pinWrap"><label class="pinlabel" for="pin0"><span data-i18n="m_pin">Enter your 4-digit PIN</span> <small>(sandbox PIN: 1234)</small></label></div>
+    <div class="pin" id="pinbox">
+      <input id="pin0" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 1">
+      <input inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 2">
+      <input inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 3">
+      <input inputmode="numeric" maxlength="1" autocomplete="off" aria-label="PIN digit 4">
+    </div>
+    <div id="pwWrap" hidden><label class="pinlabel" for="pwIn" data-i18n="m_pw_label">Enter your account password to confirm</label><input id="pwIn" class="pwin" type="password" autocomplete="current-password"></div>
+    <div id="mErr" class="err" role="alert"></div>
+    <div class="actions"><button id="mCancel" class="ghost" type="button" data-i18n="m_cancel">Cancel</button><button id="mConfirm" class="go" type="button" data-i18n="m_ok">Confirm &amp; send</button></div>
+  </div>
+</div>
+
+<div id="authScreen" class="authscreen" hidden></div>
+<div class="caption" id="caption" hidden><span id="capText"></span><button id="capStop" type="button">Stop</button></div>
+<noscript><p style="position:fixed;inset:auto 16px 16px;color:#fff">FinBridge needs JavaScript.</p></noscript>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

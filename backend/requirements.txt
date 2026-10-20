@@ -1,0 +1,8 @@
+fastapi>=0.110
+uvicorn>=0.29
+pydantic>=2.6
+pypdf>=4.0          # invoice PDF text extraction
+pytest>=8
+httpx>=0.27
+reportlab>=4.0    # study-plan PDF report (runtime) and test PDFs
+tzdata>=2024.1  # time-zone database (Windows has none; needed for profile time zones)
